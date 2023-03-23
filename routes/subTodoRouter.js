@@ -53,7 +53,7 @@ subTodoRouter
     })
 
     .delete((req, res) => {
-        res.end(`Deleting campsite: ${req.params.subTodoId}`);
+        res.end(`Deleting subTodo: ${req.params.subTodoId}`);
     });
 
 module.exports = subTodoRouter;
