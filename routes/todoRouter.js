@@ -1,22 +1,29 @@
 const express = require('express');
+const Todo = require('../models/todo');
+
 const todoRouter = express.Router();
 
 todoRouter
     .route('/')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
+    .get((req, res, next) => {
+        Todo.find()
+            .then((todos) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(todos);
+            })
+            .catch((err) => next(err));
     })
 
-    .get((req, res) => {
-        res.end('will send all the todos to you');
-    })
-
-    .post((req, res) => {
-        res.end(
-            `will add the todo: ${req.body.name} with description: ${req.body.description}`
-        );
+    .post((req, res, next) => {
+        Todo.create(req.body)
+            .then((todo) => {
+                console.log('Todo created', todo);
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(todo);
+            })
+            .catch((err) => next(err));
     })
 
     .put((req, res) => {
@@ -24,20 +31,26 @@ todoRouter
         res.end('PUT opration not supported on /todos');
     })
 
-    .delete((req, res) => {
-        res.end('deleteing all todos');
+    .delete((req, res, next) => {
+        Todo.deleteMany()
+            .then((response) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(response);
+            })
+            .catch((err) => next(err));
     });
 
 todoRouter
     .route('/:todoId')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
-    })
-
-    .get((req, res) => {
-        res.end(`Will send details of the todo: ${req.params.todoId} to you`);
+    .get((req, res, next) => {
+        Todo.findById(req.params.todoId)
+            .then((todo) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(todo);
+            })
+            .catch((err) => next(err));
     })
 
     .post((req, res) => {
@@ -45,15 +58,28 @@ todoRouter
         res.end(`POST operation not supported on /todos/${req.params.todoId}`);
     })
 
-    .put((req, res) => {
-        res.write(`Updating the todo: ${req.params.todoId}\n`);
-        res.end(
-            `Will update the todo: ${req.body.name} with description: ${req.body.description}`
-        );
+    .put((req, res, next) => {
+        Todo.findByIdAndUpdate(
+            req.params.todoId,
+            { $set: req.body },
+            { new: true }
+        )
+            .then((todo) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(todo);
+            })
+            .catch((err) => next(err));
     })
 
-    .delete((req, res) => {
-        res.end(`Deleting campsite: ${req.params.todoId}`);
+    .delete((req, res, next) => {
+        Todo.findByIdAndDelete(req.params.todoId)
+            .then((response) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(response);
+            })
+            .catch((err) => next(err));
     });
 
 module.exports = todoRouter;

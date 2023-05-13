@@ -10,6 +10,19 @@ const todoRouter = require('./routes/todoRouter');
 const subTodoRouter = require('./routes/subTodoRouter');
 const heatMapRouter = require('./routes/heatMapRouter');
 
+const mongoose = require('mongoose');
+
+const url = 'mongodb://localhost:27017/todoApp';
+const connect = mongoose.connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
+
+connect.then(
+    () => console.log('Connected correctly to server'),
+    (err) => console.log(err)
+);
+
 const app = express();
 
 // view engine setup
@@ -29,19 +42,19 @@ app.use('/subTodos', subTodoRouter);
 app.use('/heatMap', heatMapRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use(function (req, res, next) {
+    next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 module.exports = app;
