@@ -1,22 +1,31 @@
 const express = require('express');
+const subTodo = require('../models/subTodo');
+
 const subTodoRouter = express.Router();
 
 subTodoRouter
     .route('/')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
+    .get((req, res, next) => {
+        subTodo
+            .find()
+            .then((subTodos) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(subTodos);
+            })
+            .catch((err) => next(err));
     })
 
-    .get((req, res) => {
-        res.end('will send all the subTodos to you');
-    })
-
-    .post((req, res) => {
-        res.end(
-            `will add the subTodo: ${req.body.name} with description: ${req.body.description}`
-        );
+    .post((req, res, next) => {
+        subTodo
+            .create(req.body)
+            .then((SubTodo) => {
+                console.log('SubTodo has been created', SubTodo);
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(SubTodo);
+            })
+            .catch((err) => next(err));
     })
 
     .put((req, res) => {
@@ -24,36 +33,61 @@ subTodoRouter
         res.end('PUT opration not supported on /subTodos');
     })
 
-    .delete((req, res) => {
-        res.end('deleteing all subTodos');
+    .delete((req, res, next) => {
+        subTodo
+            .deleteMany()
+            .then((response) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(response);
+            })
+            .catch((err) => next(err));
     });
 
 subTodoRouter
     .route('/:subTodoId')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
-    })
-
-    .get((req, res) => {
-        res.end(`Will send details of the subTodo: ${req.params.subTodoId} to you`);
+    .get((req, res, next) => {
+        subTodo
+            .findById(req.params.subTodoId)
+            .then((todo) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(todo);
+            })
+            .catch((err) => next(err));
     })
 
     .post((req, res) => {
         res.status = 403;
-        res.end(`POST operation not supported on /subTodos/${req.params.subTodoId}`);
-    })
-
-    .put((req, res) => {
-        res.write(`Updating the subTodo: ${req.params.subTodoId}\n`);
         res.end(
-            `Will update the Subtodo: ${req.body.name} with description: ${req.body.description}`
+            `POST operation not supported on /todos/${req.params.subTodoId}`
         );
     })
 
-    .delete((req, res) => {
-        res.end(`Deleting subTodo: ${req.params.subTodoId}`);
+    .put((req, res, next) => {
+        subTodo
+            .findByIdAndUpdate(
+                req.params.subTodoId,
+                { $set: req.body },
+                { new: true }
+            )
+            .then((SubTodo) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(subTodo);
+            })
+            .catch((err) => next(err));
+    })
+
+    .delete((req, res, next) => {
+        subTodo
+            .findByIdAndDelete(req.params.subTodoId)
+            .then((response) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(response);
+            })
+            .catch((err) => next(err));
     });
 
 module.exports = subTodoRouter;

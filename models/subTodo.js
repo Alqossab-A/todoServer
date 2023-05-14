@@ -9,7 +9,8 @@ const subTodoSchema = new Schema(
             unique: true,
         },
         done: {
-            type: Booleana,
+            type: Boolean,
+            default: false,
         },
     },
     {
