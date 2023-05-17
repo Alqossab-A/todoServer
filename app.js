@@ -9,7 +9,6 @@ const usersRouter = require('./routes/users');
 const todoRouter = require('./routes/todoRouter');
 const subTodoRouter = require('./routes/subTodoRouter');
 const extraTodoRouter = require('./routes/extraTodoRouter');
-const heatMapRouter = require('./routes/heatMapRouter');
 
 const mongoose = require('mongoose');
 
@@ -41,7 +40,6 @@ app.use('/users', usersRouter);
 app.use('/todos', todoRouter);
 app.use('/subTodos', subTodoRouter);
 app.use('/extraTodos', extraTodoRouter);
-app.use('/heatMap', heatMapRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
