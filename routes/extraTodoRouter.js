@@ -1,11 +1,12 @@
 const express = require('express');
 const extraTodo = require('../models/extraTodo');
+const authenticate = require('../authenticate');
 
 const extraTodoRouter = express.Router();
 
 extraTodoRouter
     .route('/')
-    .get((req, res, next) => {
+    .get(authenticate.verifyUser, (req, res, next) => {
         extraTodo
             .find()
             .then((extraTodos) => {
@@ -16,7 +17,7 @@ extraTodoRouter
             .catch((err) => next(err));
     })
 
-    .post((req, res, next) => {
+    .post(authenticate.verifyUser, (req, res, next) => {
         extraTodo
             .create(req.body)
             .then((extraTodo) => {
@@ -28,12 +29,12 @@ extraTodoRouter
             .catch((err) => next(err));
     })
 
-    .put((req, res) => {
+    .put(authenticate.verifyUser, (req, res) => {
         res.statusCode = 403;
         res.end('PUT opration not supported on /extraTodos');
     })
 
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         extraTodo
             .deleteMany()
             .then((response) => {
@@ -46,7 +47,7 @@ extraTodoRouter
 
 extraTodoRouter
     .route('/:extraTodoId')
-    .get((req, res, next) => {
+    .get(authenticate.verifyUser, (req, res, next) => {
         extraTodo
             .findById(req.params.extraTodoId)
             .then((todo) => {
@@ -57,14 +58,14 @@ extraTodoRouter
             .catch((err) => next(err));
     })
 
-    .post((req, res) => {
+    .post(authenticate.verifyUser, (req, res) => {
         res.status = 403;
         res.end(
             `POST operation not supported on /todos/${req.params.extraTodoId}`
         );
     })
 
-    .put((req, res, next) => {
+    .put(authenticate.verifyUser, (req, res, next) => {
         extraTodo
             .findByIdAndUpdate(
                 req.params.extraTodoId,
@@ -79,7 +80,7 @@ extraTodoRouter
             .catch((err) => next(err));
     })
 
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyUser, (req, res, next) => {
         extraTodo
             .findByIdAndDelete(req.params.extraTodoId)
             .then((response) => {
