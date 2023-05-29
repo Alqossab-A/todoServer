@@ -6,7 +6,7 @@ const todoRouter = express.Router();
 
 todoRouter
     .route('/')
-    .get(authenticate.verifyUser, (req, res, next) => {
+    .get((req, res, next) => {
         Todo.find()
             .then((todos) => {
                 res.statusCode = 200;
