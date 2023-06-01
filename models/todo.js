@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const todoSchema = new Schema(
     {
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        },
         text: {
             type: String,
             required: true,
@@ -24,4 +28,5 @@ const todoSchema = new Schema(
 
 const Todo = mongoose.model('Todo', todoSchema);
 
-module.exports = Todo;
+module.exports = { Todo, todoSchema };
+

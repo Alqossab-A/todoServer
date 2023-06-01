@@ -4,3 +4,4 @@ authenticate.js
 bin
 bin/server.cert
 bin/server.key
+routes/cors.js

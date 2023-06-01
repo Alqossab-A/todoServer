@@ -2,15 +2,28 @@ const express = require('express');
 const User = require('../models/user');
 const passport = require('passport');
 const authenticate = require('../authenticate');
+const cors = require('./cors');
 
 const userRouter = express.Router();
 
 /* GET users listing. */
-userRouter.get('/', function (req, res, next) {
-    res.send('respond with a resource');
-});
+userRouter.get(
+    '/',
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res, next) => {
+        User.find()
+            .then((users) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(users);
+            })
+            .catch((err) => next(err));
+    }
+);
 
-userRouter.post('/signup', (req, res) => {
+userRouter.post('/signup', cors.corsWithOptions, (req, res) => {
     User.register(
         new User({ username: req.body.username }),
         req.body.password,
@@ -35,6 +48,7 @@ userRouter.post('/signup', (req, res) => {
 
 userRouter.post(
     '/login',
+    cors.corsWithOptions,
     passport.authenticate('local', { session: false }),
     (req, res) => {
         console.log('Login request');
@@ -50,7 +64,7 @@ userRouter.post(
     }
 );
 
-userRouter.get('/logout', (req, res, next) => {
+userRouter.get('/logout', cors.corsWithOptions, (req, res, next) => {
     if (req.session) {
         req.session.destroy((err) => {
             if (err) {
