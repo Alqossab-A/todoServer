@@ -21,15 +21,15 @@ todoRouter
 
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         const newTodo = new Todo({ ...req.body, userId: req.user._id });
-        newTodo.save()
-            .then(savedTodo => {
+        newTodo
+            .save()
+            .then((savedTodo) => {
                 res.status(201).json(savedTodo);
             })
-            .catch(err => {
+            .catch((err) => {
                 next(err);
             });
     })
-    
 
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
         res.statusCode = 403;
@@ -49,8 +49,10 @@ todoRouter
 todoRouter
     .route('/:todoId')
     .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+    
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        Todo.findById(req.params.todoId)
+        //TODO: Add this line to other Routers
+        Todo.findById({ _id:req.params.todoId, userId: req.user._id })
             .then((todo) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');

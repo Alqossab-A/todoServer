@@ -20,4 +20,4 @@ const subTodoSchema = new Schema(
 
 const subTodo = mongoose.model('subTodo', subTodoSchema);
 
-module.exports = subTodo;
+module.exports = { subTodo, subTodoSchema };

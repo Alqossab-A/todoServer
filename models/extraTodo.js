@@ -20,4 +20,4 @@ const extraTodoSchema = new Schema(
 
 const extraTodo = mongoose.model('extraTodo', extraTodoSchema);
 
-module.exports = extraTodo;
+module.exports = { extraTodo, extraTodoSchema };

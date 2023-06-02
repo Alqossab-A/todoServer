@@ -1,14 +1,17 @@
 const express = require('express');
-const extraTodo = require('../models/extraTodo');
+const { extraTodo } = require('../models/extraTodo');
 const authenticate = require('../authenticate');
+const cors = require('./cors');
 
 const extraTodoRouter = express.Router();
 
 extraTodoRouter
     .route('/')
-    .get(authenticate.verifyUser, (req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+
+    .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         extraTodo
-            .find()
+            .find({ userId: req.user._id })
             .then((extraTodos) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
@@ -17,26 +20,26 @@ extraTodoRouter
             .catch((err) => next(err));
     })
 
-    .post(authenticate.verifyUser, (req, res, next) => {
-        extraTodo
-            .create(req.body)
-            .then((extraTodo) => {
-                console.log('extraTodo has been created', extraTodo);
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(extraTodo);
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+        const newExtraTodo = new extraTodo({ ...req.body, userId: req.user._id });
+        newExtraTodo
+            .save()
+            .then((savedExtraTodo) => {
+                res.status(201).json(savedExtraTodo);
             })
-            .catch((err) => next(err));
+            .catch((err) => {
+                next(err);
+            });
     })
 
-    .put(authenticate.verifyUser, (req, res) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
         res.statusCode = 403;
         res.end('PUT opration not supported on /extraTodos');
     })
 
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         extraTodo
-            .deleteMany()
+            .deleteMany({ userId: req.user._id })
             .then((response) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
@@ -47,7 +50,9 @@ extraTodoRouter
 
 extraTodoRouter
     .route('/:extraTodoId')
-    .get(authenticate.verifyUser, (req, res, next) => {
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+
+    .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         extraTodo
             .findById(req.params.extraTodoId)
             .then((todo) => {
@@ -58,14 +63,14 @@ extraTodoRouter
             .catch((err) => next(err));
     })
 
-    .post(authenticate.verifyUser, (req, res) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
         res.status = 403;
         res.end(
             `POST operation not supported on /todos/${req.params.extraTodoId}`
         );
     })
 
-    .put(authenticate.verifyUser, (req, res, next) => {
+    .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         extraTodo
             .findByIdAndUpdate(
                 req.params.extraTodoId,
@@ -80,7 +85,7 @@ extraTodoRouter
             .catch((err) => next(err));
     })
 
-    .delete(authenticate.verifyUser, (req, res, next) => {
+    .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         extraTodo
             .findByIdAndDelete(req.params.extraTodoId)
             .then((response) => {
