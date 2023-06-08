@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const subTodoSchema = new Schema(
     {
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        },
         subText: {
             type: String,
             required: true,

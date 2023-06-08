@@ -53,12 +53,19 @@ extraTodoRouter
     .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        extraTodo
-            .findById(req.params.extraTodoId)
-            .then((todo) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(todo);
+        extraTodo.findById({ _id: req.params.todoId, userId: req.user._id })
+            .then((extraTodo) => {
+                if (extraTodo) {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(extraTodo);
+                } else {
+                    res.statusCode = 404;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({
+                        message: 'ExtraTodo does not exist',
+                    });
+                }
             })
             .catch((err) => next(err));
     })

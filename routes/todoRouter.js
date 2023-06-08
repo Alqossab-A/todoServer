@@ -49,14 +49,21 @@ todoRouter
 todoRouter
     .route('/:todoId')
     .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-    
+
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        //TODO: Add this line to other Routers
-        Todo.findById({ _id:req.params.todoId, userId: req.user._id })
+        Todo.findById({ _id: req.params.todoId, userId: req.user._id })
             .then((todo) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(todo);
+                if (todo) {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(todo);
+                } else {
+                    res.statusCode = 404;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({
+                        message: 'Todo does not exist',
+                    });
+                }
             })
             .catch((err) => next(err));
     })
@@ -65,10 +72,10 @@ todoRouter
         res.status = 403;
         res.end(`POST operation not supported on /todos/${req.params.todoId}`);
     })
-
+    //TODO: update all other routes with what below
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Todo.findByIdAndUpdate(
-            req.params.todoId,
+            { _id: req.params.todoId, userId: req.user._id },
             { $set: req.body },
             { new: true }
         )
@@ -81,7 +88,7 @@ todoRouter
     })
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        Todo.findByIdAndDelete(req.params.todoId)
+        Todo.findByIdAndDelete({ _id: req.params.todoId, userId: req.user._id })
             .then((response) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');

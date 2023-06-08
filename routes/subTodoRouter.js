@@ -53,12 +53,19 @@ subTodoRouter
     .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        subTodo
-            .findById(req.params.subTodoId)
-            .then((todo) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(todo);
+        subTodo.findById({ _id: req.params.subTodoId, userId: req.user._id })
+            .then((subTodo) => {
+                if (subTodo) {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(subTodo);
+                } else {
+                    res.statusCode = 404;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({
+                        message: 'SubTodo does not exist',
+                    });
+                }
             })
             .catch((err) => next(err));
     })

@@ -12,10 +12,6 @@ const todoSchema = new Schema(
             required: true,
             unique: true,
         },
-        todoStatus: {
-            type: String,
-            default: 'todo',
-        },
         completed: {
             type: Boolean,
             default: false,

@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 const extraTodoSchema = new Schema(
     {
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        },
         extraText: {
             type: String,
             required: true,
