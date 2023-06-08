@@ -53,7 +53,7 @@ extraTodoRouter
     .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        extraTodo.findById({ _id: req.params.todoId, userId: req.user._id })
+        extraTodo.findById({ _id: req.params.extraTodoId, userId: req.user._id })
             .then((extraTodo) => {
                 if (extraTodo) {
                     res.statusCode = 200;
@@ -73,17 +73,16 @@ extraTodoRouter
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
         res.status = 403;
         res.end(
-            `POST operation not supported on /todos/${req.params.extraTodoId}`
+            `POST operation not supported on /extraTodos/${req.params.extraTodoId}`
         );
     })
 
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        extraTodo
-            .findByIdAndUpdate(
-                req.params.extraTodoId,
-                { $set: req.body },
-                { new: true }
-            )
+        extraTodo.findByIdAndUpdate(
+            { _id: req.params.extraTodoId, userId: req.user._id },
+            { $set: req.body },
+            { new: true }
+        )
             .then((extraTodo) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
@@ -94,7 +93,7 @@ extraTodoRouter
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         extraTodo
-            .findByIdAndDelete(req.params.extraTodoId)
+            .findByIdAndDelete({ _id: req.params.extraTodoId, userId: req.user._id })
             .then((response) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');

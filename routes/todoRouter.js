@@ -72,7 +72,7 @@ todoRouter
         res.status = 403;
         res.end(`POST operation not supported on /todos/${req.params.todoId}`);
     })
-    //TODO: update all other routes with what below
+    
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Todo.findByIdAndUpdate(
             { _id: req.params.todoId, userId: req.user._id },

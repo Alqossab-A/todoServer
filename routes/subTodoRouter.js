@@ -72,19 +72,16 @@ subTodoRouter
 
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
         res.status = 403;
-        res.end(
-            `POST operation not supported on /todos/${req.params.subTodoId}`
-        );
+        res.end(`POST operation not supported on /subTodos/${req.params.subTodoId}`);
     })
 
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        subTodo
-            .findByIdAndUpdate(
-                req.params.subTodoId,
-                { $set: req.body },
-                { new: true }
-            )
-            .then((SubTodo) => {
+        subTodo.findByIdAndUpdate(
+            { _id: req.params.subTodoId, userId: req.user._id },
+            { $set: req.body },
+            { new: true }
+        )
+            .then((subTodo) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
                 res.json(subTodo);
@@ -94,7 +91,7 @@ subTodoRouter
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         subTodo
-            .findByIdAndDelete(req.params.subTodoId)
+            .findByIdAndDelete({ _id: req.params.subTodoId, userId: req.user._id })
             .then((response) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');

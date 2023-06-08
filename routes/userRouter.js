@@ -51,8 +51,6 @@ userRouter.post(
     cors.corsWithOptions,
     passport.authenticate('local', { session: false }),
     (req, res) => {
-        console.log('Login request');
-
         const token = authenticate.getToken({ _id: req.user._id });
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
