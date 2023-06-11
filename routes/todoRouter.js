@@ -7,7 +7,9 @@ const todoRouter = express.Router();
 
 todoRouter
     .route('/')
-    .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+    .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) =>
+        res.sendStatus(200)
+    )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Todo.find({ userId: req.user._id })
@@ -72,7 +74,7 @@ todoRouter
         res.status = 403;
         res.end(`POST operation not supported on /todos/${req.params.todoId}`);
     })
-    
+
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Todo.findByIdAndUpdate(
             { _id: req.params.todoId, userId: req.user._id },
