@@ -12,6 +12,7 @@ const subTodoRouter = require('./routes/subTodoRouter');
 const extraTodoRouter = require('./routes/extraTodoRouter');
 
 const mongoose = require('mongoose');
+const cors = require('cors')
 
 const url = config.mongoUrl;
 const connect = mongoose.connect(url, {
@@ -25,6 +26,8 @@ connect.then(
 );
 
 const app = express();
+// TODO
+app.use(cors())
 
 app.all('*', (req, res, next) => {
     if (req.secure) {
