@@ -51,12 +51,20 @@ userRouter.post(
     cors.corsWithOptions,
     passport.authenticate('local', { session: false }),
     (req, res) => {
+        // Generate JWT token
         const token = authenticate.getToken({ _id: req.user._id });
+
+        // Set JWT token in an HttpOnly cookie
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            sameSite: 'strict',
+            // secure: true // Set to true if using HTTPS
+        });
+
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.json({
             success: true,
-            token: token,
             status: 'Logged in :o',
         });
     }
@@ -68,7 +76,7 @@ userRouter.get('/logout', cors.corsWithOptions, (req, res, next) => {
             if (err) {
                 console.error(err);
             } else {
-                res.clearCookie('session-id');
+                res.clearCookie('jwt');
                 res.redirect('/');
             }
         });

@@ -10,7 +10,6 @@ const subTodoSchema = new Schema(
         subText: {
             type: String,
             required: true,
-            unique: true,
         },
         done: {
             type: Boolean,

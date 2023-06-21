@@ -10,7 +10,6 @@ const extraTodoSchema = new Schema(
         extraText: {
             type: String,
             required: true,
-            unique: true,
         },
         done: {
             type: Boolean,
