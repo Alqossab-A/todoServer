@@ -57,8 +57,8 @@ userRouter.post(
         // Set JWT token in an HttpOnly cookie
         res.cookie('jwt', token, {
             httpOnly: true,
-            sameSite: 'strict',
-            // secure: true // Set to true if using HTTPS
+            sameSite: 'None',
+            secure: true // Set to true if using HTTPS
         });
 
         res.statusCode = 200;
