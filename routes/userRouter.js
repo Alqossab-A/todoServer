@@ -3,6 +3,7 @@ const User = require('../models/user');
 const passport = require('passport');
 const authenticate = require('../authenticate');
 const cors = require('./cors');
+const config = require('../config');
 
 const userRouter = express.Router();
 
@@ -58,7 +59,13 @@ userRouter.post(
         res.cookie('jwt', token, {
             httpOnly: true,
             sameSite: 'None',
-            secure: true // Set to true if using HTTPS
+            secure: true, // Set to true if using HTTPS
+        });
+
+        // Set logged_in cookie
+        res.cookie('logged_in', true, {
+            sameSite: 'None',
+            secure: true, // Set to true if using HTTPS
         });
 
         res.statusCode = 200;
@@ -66,9 +73,40 @@ userRouter.post(
         res.json({
             success: true,
             status: 'Logged in :o',
+            username: req.user.username,
         });
     }
 );
+
+userRouter.get('/checkLogin', cors.corsWithOptions, (req, res) => {
+    if (req.cookies.logged_in) {
+        const token = req.cookies.jwt;
+        const result = authenticate.verifyToken(token, config.secretKey);
+
+        User.findById(result.decoded._id)
+            .then((user) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({
+                    success: true,
+                    status: 'Logged in :o',
+                    username: user.username,
+                });
+            })
+            .catch((err) => {
+                res.statusCode = 500;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({ err: err });
+            });
+    } else {
+        res.statusCode = 401;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({
+            success: false,
+            status: 'Not logged in',
+        });
+    }
+});
 
 userRouter.get('/logout', cors.corsWithOptions, (req, res, next) => {
     if (req.session) {

@@ -4,6 +4,7 @@ const path = require('path');
 const logger = require('morgan');
 const passport = require('passport');
 const config = require('./config');
+const cookieParser = require('cookie-parser');
 const { corsWithOptions } = require('./routes/cors');
 
 const indexRouter = require('./routes/index');
@@ -44,7 +45,7 @@ app.all('*', (req, res, next) => {
     }
 });
 
-
+app.use(cookieParser());
 app.use(corsWithOptions);
 
 app.set('views', path.join(__dirname, 'views'));
