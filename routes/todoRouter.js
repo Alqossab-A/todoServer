@@ -12,11 +12,12 @@ todoRouter
     )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        Todo.find({ userId: req.user._id })
-            .then((todos) => {
+        console.log(req.user.todo);
+        User.findById(req.user._id.toString())
+            .then((user) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
-                res.json(todos);
+                res.json(user.todo);
             })
             .catch((err) => next(err));
     })

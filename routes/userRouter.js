@@ -108,21 +108,16 @@ userRouter.get('/checkLogin', cors.corsWithOptions, (req, res) => {
     }
 });
 
-userRouter.get('/logout', cors.corsWithOptions, (req, res, next) => {
-    if (req.session) {
-        req.session.destroy((err) => {
-            if (err) {
-                console.error(err);
-            } else {
-                res.clearCookie('jwt');
-                res.redirect('/');
-            }
-        });
-    } else {
-        const err = new Error('You are not Logged in! sussy');
-        err.status = 401;
-        return next(err);
-    }
+userRouter.get('/logout', cors.corsWithOptions, (req, res) => {
+    res.clearCookie('jwt');
+    res.clearCookie('logged_in');
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({
+        success: true,
+        status: 'Logged out',
+    });
 });
+
 
 module.exports = userRouter;
