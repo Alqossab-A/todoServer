@@ -79,25 +79,38 @@ userRouter.post(
 );
 
 userRouter.get('/checkLogin', cors.corsWithOptions, (req, res) => {
-    if (req.cookies.logged_in) {
+    if (req.cookies.logged_in && req.cookies.jwt) {
         const token = req.cookies.jwt;
         const result = authenticate.verifyToken(token, config.secretKey);
 
-        User.findById(result.decoded._id)
-            .then((user) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json({
-                    success: true,
-                    status: 'Logged in :o',
-                    username: user.username,
+        if (result.success) {
+            User.findById(result.decoded._id)
+                .then((user) => {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({
+                        success: true,
+                        status: 'Logged in :o',
+                        username: user.username,
+                    });
+                })
+                .catch((err) => {
+                    res.statusCode = 500;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({ err: err });
                 });
-            })
-            .catch((err) => {
-                res.statusCode = 500;
-                res.setHeader('Content-Type', 'application/json');
-                res.json({ err: err });
+        } else if (result.error === 'Token expired') {
+            res.statusCode = 401;
+            res.setHeader('Content-Type', 'application/json');
+            res.json({
+                success: false,
+                status: 'Token expired',
             });
+        } else {
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.json({ err: result.error });
+        }
     } else {
         res.statusCode = 401;
         res.setHeader('Content-Type', 'application/json');
@@ -109,8 +122,8 @@ userRouter.get('/checkLogin', cors.corsWithOptions, (req, res) => {
 });
 
 userRouter.get('/logout', cors.corsWithOptions, (req, res) => {
-    res.clearCookie('jwt');
-    res.clearCookie('logged_in');
+    res.cookie('jwt', '', { expires: new Date(0), httpOnly: true, secure: true, sameSite: 'None' });
+    res.cookie('logged_in', '', { expires: new Date(0), sameSite: 'None', secure: true });
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.json({
