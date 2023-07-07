@@ -6,6 +6,7 @@ const extraTodoSchema = new Schema(
         userId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
+            required: true,
         },
         extraText: {
             type: String,

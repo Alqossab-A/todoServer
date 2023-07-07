@@ -52,20 +52,17 @@ userRouter.post(
     cors.corsWithOptions,
     passport.authenticate('local', { session: false }),
     (req, res) => {
-        // Generate JWT token
         const token = authenticate.getToken({ _id: req.user._id });
 
-        // Set JWT token in an HttpOnly cookie
         res.cookie('jwt', token, {
             httpOnly: true,
             sameSite: 'None',
-            secure: true, // Set to true if using HTTPS
+            secure: true,
         });
 
-        // Set logged_in cookie
         res.cookie('logged_in', true, {
             sameSite: 'None',
-            secure: true, // Set to true if using HTTPS
+            secure: true,
         });
 
         res.statusCode = 200;
@@ -122,8 +119,17 @@ userRouter.get('/checkLogin', cors.corsWithOptions, (req, res) => {
 });
 
 userRouter.get('/logout', cors.corsWithOptions, (req, res) => {
-    res.cookie('jwt', '', { expires: new Date(0), httpOnly: true, secure: true, sameSite: 'None' });
-    res.cookie('logged_in', '', { expires: new Date(0), sameSite: 'None', secure: true });
+    res.cookie('jwt', '', {
+        expires: new Date(0),
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+    });
+    res.cookie('logged_in', '', {
+        expires: new Date(0),
+        sameSite: 'None',
+        secure: true,
+    });
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.json({
@@ -131,6 +137,5 @@ userRouter.get('/logout', cors.corsWithOptions, (req, res) => {
         status: 'Logged out',
     });
 });
-
 
 module.exports = userRouter;
