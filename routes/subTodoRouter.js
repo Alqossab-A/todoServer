@@ -52,11 +52,13 @@ subTodoRouter
 
 subTodoRouter
     .route('/:subTodoId')
-    .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+    .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) =>
+        res.sendStatus(200)
+    )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         subTodo
-            .findById({ _id: req.params.subTodoId, userId: req.user._id })
+            .findOne({ _id: req.params.subTodoId, userId: req.user._id })
             .then((subTodo) => {
                 if (subTodo) {
                     res.statusCode = 200;
@@ -82,29 +84,46 @@ subTodoRouter
 
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         subTodo
-            .findByIdAndUpdate(
-                { _id: req.params.subTodoId, userId: req.user._id },
-                { $set: req.body },
-                { new: true }
-            )
-            .then((subTodo) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(subTodo);
+            .findById({ _id: req.params.subTodoId, userId: req.user._id })
+            .then((subtodo) => {
+                if (subtodo) {
+                    subTodo
+                        .findByIdAndUpdate(
+                            { _id: req.params.subTodoId, userId: req.user._id },
+                            { $set: req.body },
+                            { new: true }
+                        )
+                        .then((subTodo) => {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.json(subTodo);
+                        });
+                } else {
+                    res.statusCode = 404;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({ message: 'Subtodo does not exist' });
+                }
             })
             .catch((err) => next(err));
     })
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        subTodo
-            .findByIdAndDelete({
-                _id: req.params.subTodoId,
-                userId: req.user._id,
-            })
-            .then((response) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(response);
+        subTodo.findById({ _id: req.params.subTodoId, userId: req.user._id })
+            .then((subtodo) => {
+                if (subtodo) {
+                    subTodo.findByIdAndDelete({
+                        _id: req.params.subTodoId,
+                        userId: req.user._id,
+                    }).then((response) => {
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'application/json');
+                        res.json(response);
+                    });
+                } else {
+                    res.statusCode = 404;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({ message: 'Subtodo does not exist' });
+                }
             })
             .catch((err) => next(err));
     });

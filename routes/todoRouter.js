@@ -23,7 +23,7 @@ todoRouter
 
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         const newTodo = new Todo({
-            text: req.body.text,
+            ...req.body,
             userId: req.user._id,
         });
         newTodo
