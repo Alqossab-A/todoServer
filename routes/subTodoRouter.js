@@ -7,7 +7,9 @@ const subTodoRouter = express.Router();
 
 subTodoRouter
     .route('/')
-    .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+    .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) =>
+        res.sendStatus(200)
+    )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         subTodo
@@ -53,7 +55,8 @@ subTodoRouter
     .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        subTodo.findById({ _id: req.params.subTodoId, userId: req.user._id })
+        subTodo
+            .findById({ _id: req.params.subTodoId, userId: req.user._id })
             .then((subTodo) => {
                 if (subTodo) {
                     res.statusCode = 200;
@@ -72,15 +75,18 @@ subTodoRouter
 
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
         res.status = 403;
-        res.end(`POST operation not supported on /subTodos/${req.params.subTodoId}`);
+        res.end(
+            `POST operation not supported on /subTodos/${req.params.subTodoId}`
+        );
     })
 
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        subTodo.findByIdAndUpdate(
-            { _id: req.params.subTodoId, userId: req.user._id },
-            { $set: req.body },
-            { new: true }
-        )
+        subTodo
+            .findByIdAndUpdate(
+                { _id: req.params.subTodoId, userId: req.user._id },
+                { $set: req.body },
+                { new: true }
+            )
             .then((subTodo) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
@@ -91,7 +97,10 @@ subTodoRouter
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         subTodo
-            .findByIdAndDelete({ _id: req.params.subTodoId, userId: req.user._id })
+            .findByIdAndDelete({
+                _id: req.params.subTodoId,
+                userId: req.user._id,
+            })
             .then((response) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');

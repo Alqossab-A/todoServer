@@ -1,6 +1,5 @@
 const express = require('express');
 const { Todo } = require('../models/todo');
-const User = require('../models/user');
 const authenticate = require('../authenticate');
 const cors = require('./cors');
 
