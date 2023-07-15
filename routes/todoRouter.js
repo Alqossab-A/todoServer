@@ -53,7 +53,9 @@ todoRouter
 
 todoRouter
     .route('/:todoId')
-    .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+    .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) =>
+        res.sendStatus(200)
+    )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         Todo.findOne({ _id: req.params.todoId, userId: req.user._id })

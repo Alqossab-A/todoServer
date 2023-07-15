@@ -7,7 +7,9 @@ const extraTodoRouter = express.Router();
 
 extraTodoRouter
     .route('/')
-    .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+    .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) =>
+        res.sendStatus(200)
+    )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         extraTodo
@@ -21,7 +23,10 @@ extraTodoRouter
     })
 
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        const newExtraTodo = new extraTodo({ ...req.body, userId: req.user._id });
+        const newExtraTodo = new extraTodo({
+            ...req.body,
+            userId: req.user._id,
+        });
         newExtraTodo
             .save()
             .then((savedExtraTodo) => {
@@ -50,10 +55,13 @@ extraTodoRouter
 
 extraTodoRouter
     .route('/:extraTodoId')
-    .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+    .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) =>
+        res.sendStatus(200)
+    )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        extraTodo.findById({ _id: req.params.extraTodoId, userId: req.user._id })
+        extraTodo
+            .findOne({ _id: req.params.extraTodoId, userId: req.user._id })
             .then((extraTodo) => {
                 if (extraTodo) {
                     res.statusCode = 200;
@@ -78,26 +86,53 @@ extraTodoRouter
     })
 
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        extraTodo.findByIdAndUpdate(
-            { _id: req.params.extraTodoId, userId: req.user._id },
-            { $set: req.body },
-            { new: true }
-        )
-            .then((extraTodo) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(extraTodo);
+        extraTodo
+            .findById({ _id: req.params.extraTodoId, userId: req.user._id })
+            .then((extratodo) => {
+                if (extratodo) {
+                    extraTodo
+                        .findByIdAndUpdate(
+                            {
+                                _id: req.params.extraTodoId,
+                                userId: req.user._id,
+                            },
+                            { $set: req.body },
+                            { new: true }
+                        )
+                        .then((extraTodo) => {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.json(extraTodo);
+                        });
+                } else {
+                    res.statusCode = 404;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({ message: 'Extratodo does not exist' });
+                }
             })
             .catch((err) => next(err));
     })
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         extraTodo
-            .findByIdAndDelete({ _id: req.params.extraTodoId, userId: req.user._id })
-            .then((response) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(response);
+            .findById({ _id: req.params.extraTodoId, userId: req.user._id })
+            .then((extratodo) => {
+                if (extratodo) {
+                    extraTodo
+                        .findByIdAndDelete({
+                            _id: req.params.extraTodoId,
+                            userId: req.user._id,
+                        })
+                        .then((response) => {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.json(response);
+                        });
+                } else {
+                    res.statusCode = 404;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({ message: 'Extratodo does not exist' });
+                }
             })
             .catch((err) => next(err));
     });

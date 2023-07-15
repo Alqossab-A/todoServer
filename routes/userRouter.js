@@ -92,12 +92,12 @@ userRouter.get('/checkLogin', cors.corsWithOptions, (req, res) => {
                     });
                 })
                 .catch((err) => {
-                    res.statusCode = 500;
+                    res.statusCode = 501;
                     res.setHeader('Content-Type', 'application/json');
                     res.json({ err: err });
                 });
         } else if (result.error === 'Token expired') {
-            res.statusCode = 401;
+            res.statusCode = 402;
             res.setHeader('Content-Type', 'application/json');
             res.json({
                 success: false,

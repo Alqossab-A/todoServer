@@ -108,17 +108,20 @@ subTodoRouter
     })
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        subTodo.findById({ _id: req.params.subTodoId, userId: req.user._id })
+        subTodo
+            .findById({ _id: req.params.subTodoId, userId: req.user._id })
             .then((subtodo) => {
                 if (subtodo) {
-                    subTodo.findByIdAndDelete({
-                        _id: req.params.subTodoId,
-                        userId: req.user._id,
-                    }).then((response) => {
-                        res.statusCode = 200;
-                        res.setHeader('Content-Type', 'application/json');
-                        res.json(response);
-                    });
+                    subTodo
+                        .findByIdAndDelete({
+                            _id: req.params.subTodoId,
+                            userId: req.user._id,
+                        })
+                        .then((response) => {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.json(response);
+                        });
                 } else {
                     res.statusCode = 404;
                     res.setHeader('Content-Type', 'application/json');
