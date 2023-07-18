@@ -59,12 +59,10 @@ userRouter.post(
             sameSite: 'None',
             secure: true,
         });
-
         res.cookie('logged_in', true, {
             sameSite: 'None',
             secure: true,
         });
-
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.json({

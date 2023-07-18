@@ -1,68 +1,68 @@
 const express = require('express');
-const { Todo } = require('../models/todo');
+const { Note } = require('../models/notes');
 const authenticate = require('../authenticate');
 const cors = require('./cors');
 
-const todoRouter = express.Router();
+const noteRouter = express.Router();
 
-todoRouter
+noteRouter
     .route('/')
     .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) =>
         res.sendStatus(200)
     )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        Todo.find({ userId: req.user._id })
-            .then((todos) => {
+        Note.find({ userId: req.user._id })
+            .then((note) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
-                res.json(todos);
+                res.json(note);
             })
             .catch((err) => next(err));
     })
 
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        const newTodo = new Todo({
+        const newNote = new Note({
             ...req.body,
             userId: req.user._id,
         });
-        newTodo
+        newNote
             .save()
-            .then((todo) => {
+            .then((note) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
-                res.json(todo);
+                res.json(note);
             })
             .catch((err) => next(err));
     })
 
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
         res.statusCode = 403;
-        res.end('PUT opration not supported on /todos');
+        res.end('PUT opration not supported on /notes');
     })
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         res.statusCode = 403;
-        res.end('DELETE opration not supported on /todos');
+        res.end('DELETE opration not supported on /notes');
     });
 
-todoRouter
-    .route('/:todoId')
+noteRouter
+    .route('/:noteId')
     .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) =>
         res.sendStatus(200)
     )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        Todo.findOne({ _id: req.params.todoId, userId: req.user._id })
-            .then((todo) => {
-                if (todo) {
+        Note.findOne({ _id: req.params.noteId, userId: req.user._id })
+            .then((note) => {
+                if (note) {
                     res.statusCode = 200;
                     res.setHeader('Content-Type', 'application/json');
-                    res.json(todo);
+                    res.json(note);
                 } else {
                     res.statusCode = 404;
                     res.setHeader('Content-Type', 'application/json');
-                    res.json({ message: 'Todo not found' });
+                    res.json({ message: 'note not found' });
                 }
             })
             .catch((err) => next(err));
@@ -70,37 +70,37 @@ todoRouter
 
     .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
         res.status = 403;
-        res.end(`POST operation not supported on /todos/${req.params.todoId}`);
+        res.end(`POST operation not supported on /notes/${req.params.noteId}`);
     })
 
     .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        Todo.findById({ _id: req.params.todoId, userId: req.user._id })
-            .then((todo) => {
-                if (todo) {
-                    Todo.findByIdAndUpdate(
-                        { _id: req.params.todoId, userId: req.user._id },
+        Note.findById({ _id: req.params.noteId, userId: req.user._id })
+            .then((note) => {
+                if (note) {
+                    Note.findByIdAndUpdate(
+                        { _id: req.params.noteId, userId: req.user._id },
                         { $set: req.body },
                         { new: true }
-                    ).then((todo) => {
+                    ).then((note) => {
                         res.statusCode = 200;
                         res.setHeader('Content-Type', 'application/json');
-                        res.json(todo);
+                        res.json(note);
                     });
                 } else {
                     res.statusCode = 404;
                     res.setHeader('Content-Type', 'application/json');
-                    res.json({ message: 'Todo does not exist' });
+                    res.json({ message: 'note does not exist' });
                 }
             })
             .catch((err) => next(err));
     })
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        Todo.findById({ _id: req.params.todoId, userId: req.user._id })
-            .then((todo) => {
-                if (todo) {
-                    Todo.findByIdAndDelete({
-                        _id: req.params.todoId,
+        Note.findById({ _id: req.params.noteId, userId: req.user._id })
+            .then((note) => {
+                if (note) {
+                    Note.findByIdAndDelete({
+                        _id: req.params.noteId,
                         userId: req.user._id,
                     }).then((response) => {
                         res.statusCode = 200;
@@ -110,10 +110,10 @@ todoRouter
                 } else {
                     res.statusCode = 404;
                     res.setHeader('Content-Type', 'application/json');
-                    res.json({ message: 'Todo does not exist' });
+                    res.json({ message: 'note does not exist' });
                 }
             })
             .catch((err) => next(err));
     });
 
-module.exports = todoRouter;
+module.exports = noteRouter;

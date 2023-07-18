@@ -43,14 +43,8 @@ extraTodoRouter
     })
 
     .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        extraTodo
-            .deleteMany({ userId: req.user._id })
-            .then((response) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(response);
-            })
-            .catch((err) => next(err));
+        res.statusCode = 403;
+        res.end('DELETE opration not supported on /extraTodos');
     });
 
 extraTodoRouter
