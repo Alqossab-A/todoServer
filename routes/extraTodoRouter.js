@@ -13,7 +13,7 @@ extraTodoRouter
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         extraTodo
-            .find({ userId: req.user._id })
+            .find({ userId: req.user._id, done: false })
             .then((extraTodos) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');

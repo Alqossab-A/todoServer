@@ -13,7 +13,7 @@ subTodoRouter
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
         subTodo
-            .find({ userId: req.user._id })
+            .find({ userId: req.user._id, done: false })
             .then((subTodos) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
