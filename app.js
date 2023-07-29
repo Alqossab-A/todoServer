@@ -14,6 +14,7 @@ const subTodoRouter = require('./routes/subTodoRouter');
 const extraTodoRouter = require('./routes/extraTodoRouter');
 
 const mongoose = require('mongoose');
+const noteRouter = require('./routes/noteRouter');
 
 
 const url = config.mongoUrl;
@@ -65,6 +66,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/todos', todoRouter);
 app.use('/subTodos', subTodoRouter);
 app.use('/extraTodos', extraTodoRouter);
+app.use('/notes', noteRouter);
 
 app.use(function (req, res, next) {
     next(createError(404));
