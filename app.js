@@ -16,7 +16,6 @@ const extraTodoRouter = require('./routes/extraTodoRouter');
 const mongoose = require('mongoose');
 const noteRouter = require('./routes/noteRouter');
 
-
 const url = config.mongoUrl;
 const connect = mongoose.connect(url, {
     useNewUrlParser: true,

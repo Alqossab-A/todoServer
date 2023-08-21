@@ -12,7 +12,7 @@ noteRouter
     )
 
     .get(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-        Note.find({ userId: req.user._id, done: false  })
+        Note.find({ userId: req.user._id })
             .then((note) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
