@@ -74,44 +74,46 @@ userRouter.post(
 );
 
 userRouter.get('/checkLogin', cors.corsWithOptions, (req, res) => {
-    if (req.cookies.logged_in && req.cookies.jwt) {
-        const token = req.cookies.jwt;
-        const result = authenticate.verifyToken(token, config.secretKey);
+    const loggedInCookie = req.cookies.logged_in;
+    const jwtCookie = req.cookies.jwt;
 
-        if (result.success) {
-            User.findById(result.decoded._id)
+    if (loggedInCookie && jwtCookie) {
+        const token = jwtCookie;
+        const verificationResult = authenticate.verifyToken(
+            token,
+            config.secretKey
+        );
+
+        if (verificationResult.success) {
+            User.findById(verificationResult.decoded._id)
                 .then((user) => {
-                    res.statusCode = 200;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.json({
+                    res.status(200).json({
                         success: true,
-                        status: 'Logged in :o',
+                        message: 'Logged in',
                         username: user.username,
                     });
                 })
                 .catch((err) => {
-                    res.statusCode = 501;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.json({ err: err });
+                    res.status(500).json({
+                        success: false,
+                        error: err.message,
+                    });
                 });
-        } else if (result.error === 'Token expired') {
-            res.statusCode = 402;
-            res.setHeader('Content-Type', 'application/json');
-            res.json({
+        } else if (verificationResult.error === 'Token expired') {
+            res.status(401).json({
                 success: false,
-                status: 'Token expired',
+                message: 'Token expired',
             });
         } else {
-            res.statusCode = 500;
-            res.setHeader('Content-Type', 'application/json');
-            res.json({ err: result.error });
+            res.status(500).json({
+                success: false,
+                error: verificationResult.error,
+            });
         }
     } else {
-        res.statusCode = 401;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({
+        res.status(401).json({
             success: false,
-            status: 'Not logged in',
+            message: 'Not logged in',
         });
     }
 });
